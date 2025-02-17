@@ -23,3 +23,9 @@ docker exec -it mysql-container mysql -uroot -proot_password
 SOURCE /docker-entrypoint-initdb.d/init.sql;
 SHOW DATABASES;
 SELECT user, host FROM mysql.user;
+
+- docker command
+ docker build -t quiz-app .
+docker tag quiz-app:latest manoharshetty507/quiz-app:v1
+docker push manoharshetty507/quiz-app:v1
+
