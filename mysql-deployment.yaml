@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: mysql-quiz
 spec:
-  serviceName: "mysql-quiz"
+  serviceName: "mysql-quiz-service"
   replicas: 1
   selector:
     matchLabels:
@@ -63,7 +63,6 @@ spec:
     - port: 3306
       targetPort: 3306
   clusterIP: None # Ensures stable internal DNS name
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -75,7 +74,6 @@ data:
     CREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';
     GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
     FLUSH PRIVILEGES;
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -85,7 +83,6 @@ data:
   mysqld.cnf: |
     [mysqld]
     bind-address = 0.0.0.0
-
 ---
 apiVersion: v1
 kind: Secret
@@ -93,9 +90,8 @@ metadata:
   name: mysql-secrets
 type: Opaque
 data:
-  MYSQL_ROOT_PASSWORD: cXdlcnR5cGFzc3dvcmQ= # Base64 encoded password
+  MYSQL_ROOT_PASSWORD: cXdlcnR5cGFzc3dvcmQ= # Base64 encoded root password
   MYSQL_PASSWORD: cXdlcnR5cGFzc3dvcmQ= # Base64 encoded quiz_user password
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -108,4 +104,3 @@ spec:
     requests:
       storage: 1Gi
   storageClassName: nfs-client
-
