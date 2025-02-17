@@ -12,6 +12,13 @@ spec:
       labels:
         app: mysql-quiz
     spec:
+      initContainers:
+      - name: init-chown
+        image: busybox
+        command: ["sh", "-c", "chown -R 999:999 /var/lib/mysql"]
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
       containers:
         - name: mysql
           image: mysql:8.0
