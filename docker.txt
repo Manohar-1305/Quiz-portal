@@ -1,0 +1,25 @@
+-- mysql-init/init.sql
+CREATE DATABASE IF NOT EXISTS quizdb;
+CREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
+FLUSH PRIVILEGES;
+
+-- mysql-config/mysqld.cnf
+[mysqld]
+bind-address = 0.0.0.0
+
+
+docker run -d \
+  --name mysql-container \
+  -e MYSQL_ROOT_PASSWORD=root_password \
+  -e MYSQL_DATABASE=quizdb \
+  -e MYSQL_USER=quiz_user \
+  -e MYSQL_PASSWORD=password \
+  -v $(pwd)/mysql-init:/docker-entrypoint-initdb.d \
+  -v $(pwd)/mysql-config:/etc/mysql/mysql.conf.d \
+  -p 3306:3306 \
+  mysql:5.7
+
+docker logs mysql-container
+docker exec -it mysql-container mysql -u quiz_user -p
+

@@ -1,0 +1,119 @@
+sudo apt update
+sudo apt install mysql-server -y
+sudo systemctl start mysql
+sudo systemctl enable mysql
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+bind-address = 0.0.0.0
+sudo systemctl restart mysql
+sudo mysql
+CREATE DATABASE myflaskdb;
+CREATE USER 'flaskuser'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON myflaskdb.* TO 'flaskuser'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EXIT;
+
+pip install mysql-connector-python
+============================================================
+sudo apt update
+sudo apt install mysql-server -y
+sudo mysql_secure_installation
+sudo systemctl start mysql
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+sudo systemctl restart mysql
+sudo systemctl enable mysql
+sudo mysql -u root -p
+
+CREATE DATABASE quizdb;
+CREATE USER 'quiz_user'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON quiz_db.* TO 'quiz_user'@'%';
+FLUSH PRIVILEGES;
+EXIT;
+mysql -h 43.205.191.196 -u quiz_user -p
+
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+bind-address = 0.0.0.0
+sudo systemctl restart mysql
+pip install mysqlclient flask-mysql flask-sqlalchemy
+pip install flask-sqlalchemy mysqlclient
+
+-----------------------------------------------------------------
+app.py
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+
+mysql -h 43.205.116.98 -u quiz_user -p
+
+
+# Configure the MySQL database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://quiz_user:StrongPassword@your-ec2-ip/quiz_db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Optional: Disables warning
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
+
+# Define a model (example)
+class Question(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question_text = db.Column(db.String(255), nullable=False)
+
+# Create database tables before first request
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+@app.route('/')
+def home():
+    return "Flask App with MySQL!"
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://quiz_user:StrongPassword@your-ec2-ip/quiz_db'
+
+create apply db
+export FLASK_APP=app.py
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+
+--------------------------------------------------------------------------
+
+sudo apt update
+sudo apt install mysql-server -y
+sudo mysql_secure_installation
+sudo systemctl start mysql
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+sudo systemctl restart mysql
+sudo systemctl enable mysql
+sudo mysql -u root -p
+sudo mysql 
+CREATE DATABASE quiz_db;
+CREATE USER 'quiz_user'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON quiz_db.* TO 'quiz_user'@'%';
+FLUSH PRIVILEGES;
+EXIT;
+mysql -h 43.205.191.196 -u quiz_user -p
+pip install flask flask-sqlalchemy flask-login flask-migrate mysqlclient
+SELECT id, question, option1, option2, option3, option4 FROM quiz;
+SHOW DATABASES;
+CREATE DATABASE IF NOT EXISTS quiz_db;
+CREATE DATABASE quiz_db;
+USE quiz_db;
+DESC user;
+ALTER TABLE user MODIFY password VARCHAR(255);
+USE quiz_db;
+SELECT * FROM user;
+SELECT * FROM user WHERE username = 'admin';
+
+============================================================
+pip install mysqlclient flask-mysql flask-sqlalchemy
+pip install flask-sqlalchemy mysqlclient
+
+
+kubectl run -i --tty --rm --restart=Never mysql-client --image=mysql:8.0 --env="MYSQL_ROOT_PASSWORD=password" --command -- mysql -h mysql-quiz-service -u quiz_user -p
+
+
+
+

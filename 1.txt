@@ -1,0 +1,244 @@
+from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_migrate import Migrate  # Import Migrate
+
+# Initialize the Flask app
+app = Flask(__name__)
+
+# Set the app configuration
+app.config['SECRET_KEY'] = 'supersecretkey'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'  # Ensure this is set before SQLAlchemy initialization
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Optionally disable modification tracking
+
+# Initialize the database and migrate objects
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)  # Initialize Migrate after defining app
+
+# Initialize the login manager
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# Database Models (make sure this part is below the app initialization)
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+class Topic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    quizzes = db.relationship('Quiz', backref='topic', lazy=True)
+
+class Quiz(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.String(255), nullable=False)
+    option1 = db.Column(db.String(100), nullable=False)
+    option2 = db.Column(db.String(100), nullable=False)
+    option3 = db.Column(db.String(100), nullable=False)
+    option4 = db.Column(db.String(100), nullable=False)
+    correct_answer = db.Column(db.String(100), nullable=False)
+    topic_id = db.Column(db.Integer, db.ForeignKey('topic.id'), nullable=False)  # Make sure this is included
+  # Ensure this is defined
+
+
+class Score(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    score = db.Column(db.Integer, default=0)
+
+    user = db.relationship('User', backref='score', uselist=False)
+
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Admin Setup (Runs Once)
+def create_admin():
+    admin = User.query.filter_by(username="admin").first()
+    if not admin:
+        admin = User(username="admin", password=generate_password_hash("admin123"), is_admin=True)
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin user created: admin/admin123")
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = generate_password_hash(request.form['password'])
+        
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists!", "danger")
+            return redirect(url_for('register'))
+
+        user = User(username=username, password=password, is_admin=False)
+        db.session.add(user)
+        db.session.commit()
+        flash("Registration successful! Please log in.", "success")
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']  # Get selected role
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            if role == 'admin' and user.is_admin:
+                login_user(user)
+                return redirect(url_for('admin_dashboard'))
+            elif role == 'user' and not user.is_admin:
+                login_user(user)
+                return redirect(url_for('user_dashboard'))
+            else:
+                return "Invalid role selection", 403  # Prevents users from logging in as admins
+
+    return render_template('login.html')
+
+
+@app.route('/admin/dashboard', methods=['GET'])
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        return redirect(url_for('user_dashboard'))
+    quizzes = Quiz.query.all()
+    scores = Score.query.all()
+    users = User.query.all()
+    topics = Topic.query.all()  # Get all topics
+    return render_template('admin_dashboard.html', quizzes=quizzes, users=users, scores=scores, topics=topics)
+
+@app.route('/admin/create_quiz', methods=['GET', 'POST'])
+@login_required
+def create_quiz():
+    if not current_user.is_admin:
+        return redirect(url_for('user_dashboard'))  # Redirect if not admin
+    
+    topics = Topic.query.all()  # Get all topics for the dropdown
+
+    if request.method == 'POST':
+        selected_topic = request.form['topic']  # Get selected topic ID
+        new_topic = request.form.get('new_topic')  # Get new topic name if entered
+
+        # If new topic is provided, create a new topic
+        if new_topic:
+            topic = Topic(name=new_topic)
+            db.session.add(topic)
+            db.session.commit()
+
+            # Fetch the updated list of topics (including the new one)
+            topics = Topic.query.all()
+
+            flash(f"New topic '{new_topic}' created!", "success")
+            selected_topic = topic.id  # Set selected topic to newly created topic
+
+        # If no topic selected and no new topic provided, show error
+        if not selected_topic:
+            flash("Please select an existing topic or create a new one.", "danger")
+            return redirect(url_for('create_quiz'))
+
+        # Create and save the quiz with the selected/new topic
+        quiz = Quiz(
+            question=request.form['question'],
+            option1=request.form['option1'],
+            option2=request.form['option2'],
+            option3=request.form['option3'],
+            option4=request.form['option4'],
+            correct_answer=request.form['correct_answer'],
+            topic_id=selected_topic  # Link quiz to topic
+        )
+
+        db.session.add(quiz)
+        db.session.commit()
+        flash("Quiz added successfully!", "success")
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('create_quiz.html', topics=topics)
+
+
+
+
+@app.route('/admin/create_topic', methods=['GET', 'POST'])
+@login_required
+def create_topic():
+    if not current_user.is_admin:
+        return redirect(url_for('user_dashboard'))  # Redirect if not admin
+
+    if request.method == 'POST':
+        topic_name = request.form['name']
+        if topic_name:
+            topic = Topic(name=topic_name)
+            db.session.add(topic)
+            db.session.commit()
+            flash("Topic added successfully!", "success")
+            return redirect(url_for('create_topic'))  # Stay on the topic creation page after adding the topic
+        else:
+            flash("Topic name cannot be empty", "danger")
+
+    return render_template('create_topic.html')
+
+
+
+@app.route('/user/dashboard')
+@login_required
+def user_dashboard():
+    if current_user.is_admin:
+        return redirect(url_for('admin_dashboard'))  # Prevent admin from accessing user dashboard
+    
+    quizzes = Quiz.query.all()
+    score_entry = Score.query.filter_by(user_id=current_user.id).first()
+    user_score = score_entry.score if score_entry else None
+    return render_template('user_dashboard.html', quizzes=quizzes, score=user_score)
+
+
+@app.route('/submit_quiz', methods=['POST'])
+@login_required
+def submit_quiz():
+    if current_user.is_admin:
+        return redirect(url_for('admin_dashboard'))  # Prevent admin from submitting quiz
+
+    score = 0
+    for quiz in Quiz.query.all():
+        selected_answer = request.form.get(str(quiz.id))
+        if selected_answer == quiz.correct_answer:
+            score += 1
+
+    existing_score = Score.query.filter_by(user_id=current_user.id).first()
+    if existing_score:
+        existing_score.score = score
+    else:
+        new_score = Score(user_id=current_user.id, score=score)
+        db.session.add(new_score)
+
+    db.session.commit()
+    return redirect(url_for('user_dashboard'))
+
+
+@app.route('/view_quizzes')
+def view_quizzes():
+    quizzes = Quiz.query.all()  # Assuming you have a Quiz model
+    return render_template('view_quizzes.html', quizzes=quizzes)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash("You have logged out.", "info")
+    return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        create_admin()  # Ensures admin exists
+    app.run(debug=True)
