@@ -10,11 +10,10 @@ ON quizdb.* TO 'quiz_user'@'%';\nFLUSH PRIVILEGES;" > mysql-init/init.sql
 - create network
 docker network create quiz-net
 
-- mysql-container
- docker run -d   --name mysql-container   --network quiz-net   -e MYSQL_ROOT_PASSWORD=root_password   -e MYSQL_DATABASE=quizdb   -e MYSQL_USER=quiz_user   -e MYSQL_PASSWORD=password   -v $(pwd)/mysql-config:/etc/mysql/mysql.conf.d   -p 3306:3306   mysql:5.7
-
 docker run --name mysql-container -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -d -p 3306:3306 mysql:5.7
 
+- mysql-container
+ docker run -d   --name mysql-container   --network quiz-net   -e MYSQL_ROOT_PASSWORD=root_password   -e MYSQL_DATABASE=quizdb   -e MYSQL_USER=quiz_user   -e MYSQL_PASSWORD=password   -v $(pwd)/mysql-config:/etc/mysql/mysql.conf.d   -p 3306:3306   mysql:5.7
 ---
 quiz-app
 docker run -d   --name flask-app   --network quiz-net   -e DB_HOST=mysql-container   -e DB_USER=quiz_user   -e DB_PASSWORD=password   -e DB_NAME=quizdb   -p 5000:5000   manoharshetty507/quiz-app:v1
