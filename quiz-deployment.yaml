@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-app
+  template:
+    metadata:
+      labels:
+        app: flask-app
+    spec:
+      containers:
+      - name: flask-app
+        image: manoharshetty507/quiz-portal:v1  # Replace with your actual image
+        env:
+          - name: SECRET_KEY
+            value: "supersecretkey"
+          - name: DB_USER
+            value: "quiz_user"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secrets
+                key: MYSQL_PASSWORD
+          - name: DB_HOST
+            value: "mysql-quiz-service"  # Uses Kubernetes service
+          - name: DB_NAME
+            value: "quizdb"
+        ports:
+          - containerPort: 5000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-service
+spec:
+  selector:
+    app: flask-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer  # Change to NodePort if not using a cloud provider
