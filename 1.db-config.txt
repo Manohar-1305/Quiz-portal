@@ -24,6 +24,13 @@ SOURCE /docker-entrypoint-initdb.d/init.sql;
 SHOW DATABASES;
 SELECT user, host FROM mysql.user;
 
+- changes in db
+USE quizdb;
+ALTER TABLE user MODIFY password VARCHAR(255);
+FLUSH PRIVILEGES;
+EXIT;
+
+
 - docker command
  docker build -t quiz-app .
 docker tag quiz-app:latest manoharshetty507/quiz-app:v1
