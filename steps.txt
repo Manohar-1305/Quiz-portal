@@ -26,3 +26,9 @@ echo "cXdlcnR5cGFzc3dvcmQ=" | base64 --decode
 
 ALTER USER 'root'@'%' IDENTIFIED BY 'new_password';
 ALTER TABLE mysql.user MODIFY COLUMN authentication_string TEXT;
+
+SHOW DATABASES;
+SHOW COLUMNS FROM user;
+ALTER TABLE user MODIFY COLUMN password TEXT;
+
+
