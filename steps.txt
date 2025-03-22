@@ -12,6 +12,15 @@ qwertypassword
 new_password
 ALTER USER 'root'@'%' IDENTIFIED BY '';
 FLUSH PRIVILEGES;
+----------------------------------------------------------
+USE mysql;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
+FLUSH PRIVILEGES;
+EXIT;
+mysql -u root -p
+
+-----------------------------------------------------------
+new_password
 
 echo "cXdlcnR5cGFzc3dvcmQ=" | base64 --decode
 
