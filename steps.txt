@@ -4,3 +4,13 @@ docker tag quiz-app manoharshetty507/quiz-app:v1
 docker push manoharshetty507/quiz-app:v1
 
 docker run -p 5000:5000 manoharshetty507/quiz-app:v1
+
+
+kubectl exec -it mysql-quiz-0 -- /bin/bash
+mysql -u root -p
+qwertypassword
+ALTER USER 'root'@'%' IDENTIFIED BY '';
+FLUSH PRIVILEGES;
+
+echo "cXdlcnR5cGFzc3dvcmQ=" | base64 --decode
+
