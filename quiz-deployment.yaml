@@ -40,8 +40,9 @@ metadata:
 spec:
   selector:
     app: flask-app
+  type: NodePort  # Changed from LoadBalancer to NodePort
   ports:
     - protocol: TCP
       port: 80
       targetPort: 5000
-  type: LoadBalancer  # Change to NodePort if not using a cloud provider
+      nodePort: 30010  # Updated NodePort (Must be in range 30000-32767)
