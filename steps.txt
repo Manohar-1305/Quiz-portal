@@ -31,4 +31,11 @@ SHOW DATABASES;
 SHOW COLUMNS FROM user;
 ALTER TABLE user MODIFY COLUMN password TEXT;
 
+---------------------------------------------------
+Modify in pod 
+USE quizdb;
+ALTER TABLE user MODIFY COLUMN password VARCHAR(255);
+DESCRIBE user;
+EXIT;
+
 
