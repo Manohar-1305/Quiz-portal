@@ -1,0 +1,4 @@
+sudo mkdir -p mysql-config && echo -e "[mysqld]\nbind-address = 0.0.0.0" | sudo tee mysql-config/mysqld.cnf > /dev/null
+sudo mkdir -p mysql-init && echo -e "CREATE DATABASE IF NOT EXISTS quizdb;\nCREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';\nGRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';\nFLUSH PRIVILEGES;" | sudo tee mysql-init/init.sql > /dev/null
+
+ON quizdb.* TO 'quiz_user'@'%';\nFLUSH PRIVILEGES;" > mysql-init/init.sql
