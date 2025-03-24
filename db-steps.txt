@@ -3,7 +3,7 @@
 sudo apt update
 sudo apt install mysql-server -y
 sudo mysql_secure_installation
-sudo systemctl start mysql
+sudo systemctl status mysql
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
 grep 'bind-address' /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -14,19 +14,30 @@ sudo systemctl enable mysql
 systemctl status  mysql
 
 sudo mysql -u root -p
+
+-----------------------------------------------------
 SHOW DATABASES;
 SELECT user, host FROM mysql.user;
-USE quizdb;
------------------------------------------------------
 CREATE DATABASE quizdb;
 CREATE USER 'quiz_user'@'%' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
 FLUSH PRIVILEGES;
 EXIT;
 USE quizdb;
-SHOW CREATE TABLE user;
+SHOW TABLES;
+CREATE TABLE user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(512) NOT NULL,
+    is_admin TINYINT(1) NOT NULL
+);
 ALTER TABLE user MODIFY COLUMN password VARCHAR(512);
---------------------------------------------------------
+------------------------------------
+- Get the quizes from the database
+SELECT * FROM quiz;
+-------------------------------------
+
+
 mysql -h 43.205.191.196 -u quiz_user -p
 
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
