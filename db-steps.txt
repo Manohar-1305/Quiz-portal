@@ -13,12 +13,16 @@ sudo mysql -u root -p
 SHOW DATABASES;
 SELECT user, host FROM mysql.user;
 USE quizdb;
-
+-----------------------------------------------------
 CREATE DATABASE quizdb;
 CREATE USER 'quiz_user'@'%' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
 FLUSH PRIVILEGES;
 EXIT;
+USE quizdb;
+SHOW CREATE TABLE user;
+ALTER TABLE user MODIFY COLUMN password VARCHAR(512);
+--------------------------------------------------------
 mysql -h 43.205.191.196 -u quiz_user -p
 
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
