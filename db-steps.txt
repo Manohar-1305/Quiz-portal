@@ -35,8 +35,35 @@ ALTER TABLE user MODIFY COLUMN password VARCHAR(512);
 ------------------------------------
 - Get the quizes from the database
 SELECT * FROM quiz;
--------------------------------------
+SELECT * FROM topic;
+INSERT INTO topic (name) VALUES ('Docker');
 
+-------------------------------------
+- Create a Quiz
+INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id) 
+VALUES ('What is Amazon EC2?', 
+        'A cloud storage service', 
+        'A virtual machine service', 
+        'A database service', 
+        'A content delivery network', 
+        'A virtual machine service', 
+        3);
+-------------------------------------------------------------------------------------------------------
+INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id)  
+VALUES  
+('What is the purpose of Kubernetes?', 'Continuous Integration', 'Container Orchestration', 'Configuration Management', 'Cloud Storage', 'Container Orchestration', 1),  
+('Which component manages the worker nodes in Kubernetes?', 'Pod', 'Kubelet', 'Kube-apiserver', 'Controller Manager', 'Kubelet', 1),  
+('Which AWS service is used for virtual machines?', 'S3', 'EC2', 'Lambda', 'RDS', 'EC2', 5),  
+('What is Terraform mainly used for?', 'Container Orchestration', 'Infrastructure as Code', 'CI/CD', 'Monitoring', 'Infrastructure as Code', 3),  
+('Which tool is used for configuration management?', 'Docker', 'Terraform', 'Ansible', 'Kubernetes', 'Ansible', 4),  
+('Which service in AWS is used for object storage?', 'EC2', 'RDS', 'S3', 'IAM', 'S3', 5),  
+('What is the main purpose of Docker?', 'Creating Virtual Machines', 'Application Containerization', 'Cloud Storage', 'CI/CD', 'Application Containerization', 2),  
+('Which component in Docker is responsible for running containers?', 'Pod', 'Container', 'Docker Daemon', 'Registry', 'Container', 2),  
+('What is an AMI in AWS?', 'Amazon Machine Image', 'Application Management Interface', 'AWS Management Instance', 'Amazon Monitoring Infrastructure', 'Amazon Machine Image', 5),  
+('Which command is used to create infrastructure in Terraform?', 'terraform apply', 'terraform build', 'terraform create', 'terraform run', 'terraform apply', 3);
+
+SELECT * FROM quiz WHERE topic_id = 3;
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 mysql -h 43.205.191.196 -u quiz_user -p
 
