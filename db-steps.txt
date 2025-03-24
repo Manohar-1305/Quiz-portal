@@ -36,19 +36,50 @@ ALTER TABLE user MODIFY COLUMN password VARCHAR(512);
 - Get the quizes from the database
 SELECT * FROM quiz;
 SELECT * FROM topic;
-INSERT INTO topic (name) VALUES ('Docker');
+-------------------------------------------
+- Create Topics
+INSERT INTO topic (name) VALUES 
+('AWS'),
+('Docker'),
+('Kubernetes'),
+('Ansible'),
+('Terraform');
+('Jenkins'),
+('Prometheus & Grafana'),
 
--------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 - Create a Quiz
-INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id) 
-VALUES ('What is Amazon EC2?', 
-        'A cloud storage service', 
-        'A virtual machine service', 
-        'A database service', 
-        'A content delivery network', 
-        'A virtual machine service', 
-        3);
+INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id) VALUES 
+-- AWS
+('Which AWS service is used for serverless computing?', 'EC2', 'Lambda', 'S3', 'CloudFront', 'Lambda', 1),
+('What is the primary use of AWS IAM?', 'Storage Management', 'Identity & Access Management', 'Networking', 'Monitoring', 'Identity & Access Management', 1),
+
+-- Docker
+('Which command is used to build a Docker image?', 'docker run', 'docker build', 'docker compose', 'docker start', 'docker build', 2),
+('What is the purpose of a Dockerfile?', 'Defines container dependencies', 'Stores logs', 'Manages networking', 'Schedules containers', 'Defines container dependencies', 2),
+
+-- Kubernetes
+('What is a Kubernetes Deployment?', 'A single container', 'A way to define and manage Pods', 'A security mechanism', 'A load balancer', 'A way to define and manage Pods', 3),
+('Which command is used to check the status of a Kubernetes cluster?', 'kubectl get nodes', 'kubectl apply', 'kubectl run', 'kubectl delete', 'kubectl get nodes', 3),
+
+-- Ansible
+('Which file format does Ansible use for playbooks?', 'JSON', 'YAML', 'XML', 'INI', 'YAML', 4),
+('What is the inventory file in Ansible used for?', 'Storing logs', 'Defining managed hosts', 'Configuring security', 'Monitoring applications', 'Defining managed hosts', 4),
+
+-- Terraform
+('Which command initializes a Terraform project?', 'terraform plan', 'terraform init', 'terraform apply', 'terraform destroy', 'terraform init', 5),
+('How does Terraform store infrastructure state?', 'In a JSON file', 'In a database', 'In a state file', 'In an S3 bucket', 'In a state file', 5),
+
+-- Jenkins
+('What is Jenkins used for?', 'Configuration Management', 'Continuous Integration/Continuous Deployment', 'Container Orchestration', 'Cloud Monitoring', 'Continuous Integration/Continuous Deployment', 6),
+('Which file is used to define a Jenkins pipeline?', 'Jenkinsfile', 'Dockerfile', 'Playbook.yaml', 'terraform.tf', 'Jenkinsfile', 6),
+
+-- Prometheus & Grafana
+('What is Prometheus primarily used for?', 'Application Development', 'Infrastructure Monitoring', 'Serverless Computing', 'Container Management', 'Infrastructure Monitoring', 7),
+('Which database does Grafana use by default?', 'MySQL', 'InfluxDB', 'SQLite', 'PostgreSQL', 'SQLite', 7);
+
 -------------------------------------------------------------------------------------------------------
+Questions set-2
 INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id)  
 VALUES  
 ('What is the purpose of Kubernetes?', 'Continuous Integration', 'Container Orchestration', 'Configuration Management', 'Cloud Storage', 'Container Orchestration', 1),  
@@ -63,6 +94,30 @@ VALUES
 ('Which command is used to create infrastructure in Terraform?', 'terraform apply', 'terraform build', 'terraform create', 'terraform run', 'terraform apply', 3);
 
 SELECT * FROM quiz WHERE topic_id = 3;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+- Questions set-2
+INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id)  
+VALUES  
+-- Kubernetes  
+('What is the smallest deployable unit in Kubernetes?', 'Node', 'Pod', 'Cluster', 'Service', 'Pod', 1),  
+('Which Kubernetes component manages the API requests?', 'Kubelet', 'Controller Manager', 'Kube-apiserver', 'Scheduler', 'Kube-apiserver', 1),  
+
+-- Docker  
+('Which command is used to list all running Docker containers?', 'docker ps', 'docker images', 'docker run', 'docker start', 'docker ps', 2),  
+('Which Dockerfile instruction is used to set the base image?', 'RUN', 'CMD', 'FROM', 'ENTRYPOINT', 'FROM', 2),  
+
+-- Terraform  
+('What is the default language used in Terraform configuration files?', 'Python', 'YAML', 'JSON', 'HCL', 'HCL', 3),  
+('Which Terraform command is used to initialize a working directory?', 'terraform init', 'terraform apply', 'terraform destroy', 'terraform plan', 'terraform init', 3),  
+
+-- Ansible  
+('Which file format does Ansible use for playbooks?', 'JSON', 'YAML', 'XML', 'INI', 'YAML', 4),  
+('Which command is used to check Ansible syntax before running a playbook?', 'ansible-lint', 'ansible-test', 'ansible --check', 'ansible-playbook --syntax-check', 'ansible-playbook --syntax-check', 4),  
+
+-- AWS  
+('Which AWS service is used for serverless computing?', 'EC2', 'S3', 'Lambda', 'RDS', 'Lambda', 5),  
+('Which AWS database service is fully managed and relational?', 'DynamoDB', 'RDS', 'S3', 'Redshift', 'RDS', 5);
+--------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 mysql -h 43.205.191.196 -u quiz_user -p
