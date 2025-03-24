@@ -7,6 +7,8 @@ sudo systemctl start mysql
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo systemctl restart mysql
 sudo systemctl enable mysql
+systemctl status  mysql
+
 sudo mysql -u root -p
 SHOW DATABASES;
 SELECT user, host FROM mysql.user;
