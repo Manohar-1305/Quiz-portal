@@ -14,7 +14,7 @@ USE quizdb;
 
 CREATE DATABASE quizdb;
 CREATE USER 'quiz_user'@'%' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON quiz_db.* TO 'quiz_user'@'%';
+GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
 FLUSH PRIVILEGES;
 EXIT;
 mysql -h 43.205.191.196 -u quiz_user -p
