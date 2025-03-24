@@ -8,6 +8,9 @@ sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo systemctl restart mysql
 sudo systemctl enable mysql
 sudo mysql -u root -p
+SHOW DATABASES;
+SELECT user, host FROM mysql.user;
+USE quizdb;
 
 CREATE DATABASE quizdb;
 CREATE USER 'quiz_user'@'%' IDENTIFIED BY 'password';
