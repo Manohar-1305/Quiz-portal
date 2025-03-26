@@ -35,14 +35,15 @@ SELECT * FROM quiz;
 SELECT * FROM topic;
 -------------------------------------------
 - Create Topics
-INSERT INTO topic (name) VALUES 
+INSERT IGNORE INTO topic (name) VALUES 
 ('AWS'),
 ('Docker'),
-('Kubernetes'),
+('Kubernetes'),  -- This will be ignored if it already exists
 ('Ansible'),
-('Terraform');
+('Terraform'),
 ('Jenkins'),
-('Prometheus & Grafana'),
+('Prometheus & Grafana');
+
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 - Create a Quiz
@@ -77,6 +78,15 @@ INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, 
 
 -------------------------------------------------------------------------------------------------------
 Questions set-2
+INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id)
+VALUES
+('What is the purpose of Kubernetes?', 'Continuous Integration', 'Container Orchestration', 'Configuration Management', 'Cloud Storage', 'Container Orchestration', 1);
+
+INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id)  
+VALUES  
+('Which tool is used for configuration management?', 'Docker', 'Terraform', 'Ansible', 'Kubernetes', 'Ansible', 17);  
+
+
 INSERT INTO quiz (question, option1, option2, option3, option4, correct_answer, topic_id)  
 VALUES  
 ('What is the purpose of Kubernetes?', 'Continuous Integration', 'Container Orchestration', 'Configuration Management', 'Cloud Storage', 'Container Orchestration', 1),  
