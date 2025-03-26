@@ -1,6 +1,6 @@
 
 ============================================================
-sudo apt update
+sudo apt update -y
 sudo apt install mysql-server -y
 sudo mysql_secure_installation
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
