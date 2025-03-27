@@ -33,6 +33,12 @@ ALTER TABLE user MODIFY COLUMN password VARCHAR(512);
 - Get the quizes from the database
 SELECT * FROM quiz;
 SELECT * FROM topic;
+
+CREATE TABLE topic (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
 -------------------------------------------
 - Create Topics
 INSERT IGNORE INTO topic (name) VALUES 
