@@ -30,6 +30,18 @@ CREATE TABLE user (
 );
 ALTER TABLE user MODIFY COLUMN password VARCHAR(512);
 ------------------------------------
+Create a Quizdb
+CREATE TABLE quiz (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question TEXT,
+    option1 VARCHAR(255),
+    option2 VARCHAR(255),
+    option3 VARCHAR(255),
+    option4 VARCHAR(255),
+    correct_answer VARCHAR(255),
+    topic_id INT
+);
+---------------------------------
 - Get the quizes from the database
 SELECT * FROM quiz;
 SELECT * FROM topic;
