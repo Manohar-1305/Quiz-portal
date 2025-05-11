@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-quiz
+spec:
+  serviceName: "mysql-quiz-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-quiz
+  template:
+    metadata:
+      labels:
+        app: mysql-quiz
+    spec:
+      initContainers:
+      - name: init-chown
+        image: busybox
+        command: ["sh", "-c", "echo 'Starting Chowning Files' && chown -R 999:999 /var/lib/mysql && echo 'Finished'"]
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      - name: mysql-import
+        image: mysql:8.0
+        command:
+          - "/bin/bash"
+          - "-c"
+          - |
+            echo "Starting DB Import..."
+            mysql -u root -p$MYSQL_ROOT_PASSWORD quizdb < /tmp/my_database.sql
+            echo "DB Import Finished!"
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secrets
+                key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+          - name: mysql-data
+            mountPath: /var/lib/mysql
+          - name: sql-dump
+            mountPath: /tmp
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secrets
+                key: MYSQL_ROOT_PASSWORD
+          - name: MYSQL_DATABASE
+            value: quizdb
+          - name: MYSQL_USER
+            value: quiz_user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secrets
+                key: MYSQL_PASSWORD
+        ports:
+          - containerPort: 3306
+        volumeMounts:
+          - name: mysql-data
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - name: sql-dump
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-quiz-service
+spec:
+  selector:
+    app: mysql-quiz
+  ports:
+    - port: 3306
+      targetPort: 3306
+  clusterIP: None  # Ensures stable internal DNS name
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS quizdb;
+    CREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';
+    GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
+    FLUSH PRIVILEGES;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  mysqld.cnf: |
+    [mysqld]
+    bind-address = 0.0.0.0
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secrets
+type: Opaque
+data:
+  MYSQL_ROOT_PASSWORD: cXdlcnR5cGFzc3dvcmQ=  # Base64 encoded root password
+  MYSQL_PASSWORD: cXdlcnR5cGFzc3dvcmQ=  # Base64 encoded quiz_user password
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
