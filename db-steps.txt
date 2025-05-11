@@ -168,4 +168,5 @@ ON quizdb.* TO 'quiz_user'@'%';\nFLUSH PRIVILEGES;" > mysql-init/init.sql
 mysqldump -u root -p quizdb > /tmp/my_database.sql
 
 -Copy Backup to pod
-kubectl cp <mysql-pod-name>:/tmp/my_database.sql ./my_database.sql
+kubectl cp my_database.sql mysql-quiz-0:/tmp/my_database.sql
+
