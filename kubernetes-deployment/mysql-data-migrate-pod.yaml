@@ -20,14 +20,13 @@ spec:
         volumeMounts:
         - name: mysql-data
           mountPath: /var/lib/mysql
-      - name: mysql-import
+      - name: mysql-init
         image: mysql:8.0
-        command:
-          - "/bin/bash"
-          - "-c"
+        command: ["/bin/bash", "-c"]
+        args:
           - |
             echo "Starting DB Import..."
-            mysql -u root -p$MYSQL_ROOT_PASSWORD quizdb < /tmp/my_database.sql
+            mysql -u root -p$MYSQL_ROOT_PASSWORD -h mysql-quiz-service quizdb < /tmp/my_database.sql;
             echo "DB Import Finished!"
         env:
           - name: MYSQL_ROOT_PASSWORD
@@ -68,7 +67,20 @@ spec:
           persistentVolumeClaim:
             claimName: mysql-pvc
         - name: sql-dump
-          emptyDir: {}
+          configMap:
+            name: mysql-backup-sql  # ConfigMap holding the SQL dump file
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-backup-sql
+data:
+  my_database.sql: |
+    -- Replace with your actual SQL dump content
+    CREATE DATABASE IF NOT EXISTS quizdb;
+    CREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';
+    GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
+    FLUSH PRIVILEGES;
 ---
 apiVersion: v1
 kind: Service
@@ -81,26 +93,6 @@ spec:
     - port: 3306
       targetPort: 3306
   clusterIP: None  # Ensures stable internal DNS name
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-init-script
-data:
-  init.sql: |
-    CREATE DATABASE IF NOT EXISTS quizdb;
-    CREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';
-    GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
-    FLUSH PRIVILEGES;
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-config
-data:
-  mysqld.cnf: |
-    [mysqld]
-    bind-address = 0.0.0.0
 ---
 apiVersion: v1
 kind: Secret
