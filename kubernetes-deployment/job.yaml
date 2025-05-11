@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-db-import
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mysql-import
+        image: mysql:8.0
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            echo "Starting DB Import..."
+            mysql -h mysql-quiz-service -u root -p$MYSQL_ROOT_PASSWORD quizdb < /tmp/my_database.sql;
+            echo "DB Import Finished!"
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secrets
+                key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+        - name: sql-dump
+          mountPath: /tmp
+      volumes:
+        - name: sql-dump
+          configMap:
+            name: mysql-backup-sql
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-backup-sql
+data:
+  my_database.sql: |
+    -- Replace this with your actual SQL content
+    CREATE DATABASE IF NOT EXISTS quizdb;
+    CREATE USER IF NOT EXISTS 'quiz_user'@'%' IDENTIFIED BY 'password';
+    GRANT ALL PRIVILEGES ON quizdb.* TO 'quiz_user'@'%';
+    FLUSH PRIVILEGES;
